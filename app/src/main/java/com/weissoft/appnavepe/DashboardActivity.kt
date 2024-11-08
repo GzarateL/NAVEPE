@@ -12,8 +12,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.navigation.NavHostController
 fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState() // Estado de desplazamiento
 
     // Launcher para solicitar el permiso de llamada
     val launcher = rememberLauncherForActivityResult(
@@ -56,6 +59,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState) // Habilita desplazamiento vertical
         ) {
             // Row for Car Logo
             Row(
@@ -143,7 +147,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 
             // Last Movements Section
             Text(
-                text = "ULTIMOS MOVIMIENTOS",
+                text = "ULTIMAS NOTIFICACIONES",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -158,7 +162,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
-            onProfileClick = { navController.navigate("carProfile") } // Navegar a la pantalla de perfil
+            onProfileClick = { navController.navigate("carProfile") }
         )
     }
 }
@@ -199,7 +203,6 @@ fun BottomNavigationBar(
             // Acción para ir a galería
         }
         NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL") {
-            // Navegar al perfil del auto
             onProfileClick()
         }
     }
