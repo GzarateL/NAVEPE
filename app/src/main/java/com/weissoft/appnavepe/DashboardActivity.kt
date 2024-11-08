@@ -27,9 +27,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-fun DashboardScreen(modifier: Modifier = Modifier) {
+fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
 
@@ -100,7 +101,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 
             // Camera Section
             Text(
-                text = "CAMARA",
+                text = "¿QUE ESTA PASANDO AHORA?",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -113,18 +114,18 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp) // Márgenes laterales de 16dp
+                    .padding(horizontal = 16.dp)
                     .height(120.dp)
                     .border(
-                        BorderStroke(2.dp, Color.Black), // Borde negro de 2dp
+                        BorderStroke(2.dp, Color.Black),
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .background(if (isPressed) Color.Gray else Color.White, shape = RoundedCornerShape(8.dp)) // Fondo cambia a gris al presionar
+                    .background(if (isPressed) Color.Gray else Color.White, shape = RoundedCornerShape(8.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
                                 isPressed = true
-                                tryAwaitRelease() // Espera a que el usuario libere el botón
+                                tryAwaitRelease()
                                 isPressed = false
                             }
                         )
@@ -132,7 +133,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_eye), // Reemplaza con tu ícono de la cámara
+                    painter = painterResource(id = R.drawable.ic_eye),
                     contentDescription = "Camera Icon",
                     modifier = Modifier.size(40.dp)
                 )
@@ -156,7 +157,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         BottomNavigationBar(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            onProfileClick = { navController.navigate("carProfile") } // Navegar a la pantalla de perfil
         )
     }
 }
@@ -179,7 +181,10 @@ fun CircularButton(text: String, backgroundColor: Color, onClick: () -> Unit = {
 }
 
 @Composable
-fun BottomNavigationBar(modifier: Modifier = Modifier) {
+fun BottomNavigationBar(
+    modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit
+) {
     Row(
         modifier = modifier
             .background(Color.Black)
@@ -187,17 +192,28 @@ fun BottomNavigationBar(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        NavigationItem(iconResource = R.drawable.ic_settings, label = "AJUSTES")
-        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERIA")
-        NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL")
+        NavigationItem(iconResource = R.drawable.ic_settings, label = "AJUSTES") {
+            // Acción para ir a ajustes
+        }
+        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERIA") {
+            // Acción para ir a galería
+        }
+        NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL") {
+            // Navegar al perfil del auto
+            onProfileClick()
+        }
     }
 }
 
 @Composable
-fun NavigationItem(iconResource: Int, label: String) {
+fun NavigationItem(iconResource: Int, label: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { onClick() })
+            }
     ) {
         Image(
             painter = painterResource(id = iconResource),
