@@ -6,20 +6,22 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +44,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             Toast.makeText(context, "Permiso de llamada denegado", Toast.LENGTH_SHORT).show()
         }
     }
+
+    var isPressed by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -105,16 +109,30 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Botón de la cámara con efecto de presionado
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp) // Márgenes laterales de 16dp
                     .height(120.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .padding(16.dp),
+                    .border(
+                        BorderStroke(2.dp, Color.Black), // Borde negro de 2dp
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .background(if (isPressed) Color.Gray else Color.White, shape = RoundedCornerShape(8.dp)) // Fondo cambia a gris al presionar
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                isPressed = true
+                                tryAwaitRelease() // Espera a que el usuario libere el botón
+                                isPressed = false
+                            }
+                        )
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_eye),
+                    painter = painterResource(id = R.drawable.ic_eye), // Reemplaza con tu ícono de la cámara
                     contentDescription = "Camera Icon",
                     modifier = Modifier.size(40.dp)
                 )
