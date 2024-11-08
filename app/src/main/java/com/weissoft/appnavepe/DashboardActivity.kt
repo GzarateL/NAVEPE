@@ -30,12 +30,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState() // Estado de desplazamiento
+
+    // Estado para almacenar la hora actual
+    var currentTime by remember { mutableStateOf(getCurrentTime()) }
+
+    // Actualiza la hora cada segundo
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentTime = getCurrentTime()
+            kotlinx.coroutines.delay(1000L) // 1 segundo
+        }
+    }
 
     // Launcher para solicitar el permiso de llamada
     val launcher = rememberLauncherForActivityResult(
@@ -61,18 +74,26 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                 .fillMaxSize()
                 .verticalScroll(scrollState) // Habilita desplazamiento vertical
         ) {
-            // Row for Car Logo
+            // Row for Car Logo and Current Time
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.car_image),
                     contentDescription = "Car Logo",
                     modifier = Modifier.size(60.dp)
+                )
+
+                // Mostrar hora actual en la misma línea que el logo
+                Text(
+                    text = "HORA ACTUAL: $currentTime",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
 
@@ -225,6 +246,12 @@ fun NavigationItem(iconResource: Int, label: String, onClick: () -> Unit) {
         )
         Text(text = label, color = Color.White)
     }
+}
+
+// Función para obtener la hora actual
+fun getCurrentTime(): String {
+    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    return sdf.format(Date())
 }
 
 // Función para realizar la llamada telefónica
