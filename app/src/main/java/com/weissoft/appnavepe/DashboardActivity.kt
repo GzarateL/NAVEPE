@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -16,7 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,7 +28,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current  // Obtener el contexto para la llamada
+    val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
 
     // Launcher para solicitar el permiso de llamada
@@ -49,21 +47,21 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp) // Deja espacio para la barra de navegación
         ) {
             // Row for Car Logo
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.car_image), // Reemplaza con el recurso de tu logo de coche
+                    painter = painterResource(id = R.drawable.car_image),
                     contentDescription = "Car Logo",
                     modifier = Modifier.size(60.dp)
                 )
@@ -71,7 +69,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Button Container
+            // Rectángulo negro que ocupa todo el ancho de la pantalla
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -101,7 +99,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 text = "CAMARA",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.Black,
+                modifier = Modifier.padding(start = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -115,7 +114,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_eye), // Reemplaza con el icono de "ojo" para la cámara
+                    painter = painterResource(id = R.drawable.ic_eye),
                     contentDescription = "Camera Icon",
                     modifier = Modifier.size(40.dp)
                 )
@@ -128,8 +127,11 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 text = "ULTIMOS MOVIMIENTOS",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.Black,
+                modifier = Modifier.padding(start = 16.dp)
             )
+
+            Spacer(modifier = Modifier.weight(1f)) // Espaciador para empujar la barra de navegación hacia abajo
         }
 
         // Bottom Navigation Bar aligned to the bottom of the screen
@@ -168,6 +170,7 @@ fun BottomNavigationBar(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         NavigationItem(iconResource = R.drawable.ic_settings, label = "AJUSTES")
+        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERIA")
         NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL")
     }
 }
