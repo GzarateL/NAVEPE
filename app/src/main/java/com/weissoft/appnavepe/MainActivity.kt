@@ -8,38 +8,53 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
+import com.weissoft.appnavepe.room.CarProfileDatabase
+import com.weissoft.appnavepe.room.CarProfileRepository
+import com.weissoft.appnavepe.ui.screens.CarProfileScreen
+import com.weissoft.appnavepe.ui.screens.CreateProfileScreen
 import com.weissoft.appnavepe.ui.theme.AppNavepeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Configura la base de datos
+        val database = Room.databaseBuilder(
+            applicationContext,
+            CarProfileDatabase::class.java,
+            "car_profile_database"
+        ).build()
+
+        val repository = CarProfileRepository(database.carProfileDao())
+
         setContent {
             AppNavepeTheme {
-                // Crear el NavController
                 val navController = rememberNavController()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Configurar el NavHost con el navController y definir las rutas
                     NavHost(
                         navController = navController,
                         startDestination = "dashboard",
                         Modifier.padding(innerPadding)
                     ) {
-                        // Ruta para el DashboardScreen
                         composable("dashboard") {
-                            DashboardScreen(
-                                navController = navController // Pasar el navController a DashboardScreen
-                            )
+                            DashboardScreen(navController = navController)
                         }
-                        // Ruta para el CarProfileScreen
                         composable("carProfile") {
                             CarProfileScreen(
-                                navController = navController // Pasar el navController a CarProfileScreen
+                                navController = navController,
+                                repository = repository
+                            )
+                        }
+                        composable("createProfileScreen") { // Añadir createProfileScreen aquí
+                            CreateProfileScreen(
+                                navController = navController,
+                                repository = repository
                             )
                         }
                     }

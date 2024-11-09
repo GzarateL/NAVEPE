@@ -1,16 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt") // Asegúrate de tener esta línea para habilitar KAPT para Room
 }
 
 android {
     namespace = "com.weissoft.appnavepe"
-    compileSdk = 35 // Actualizado a 35
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.weissoft.appnavepe"
         minSdk = 24
-        targetSdk = 35 // Actualizado a 35
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -59,6 +60,16 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+
+    // Room dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler) // Esta línea es esencial para el compilador de Room
+
+    // Nuevas dependencias
+    implementation ("io.coil-kt:coil-compose:2.1.0")
+
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

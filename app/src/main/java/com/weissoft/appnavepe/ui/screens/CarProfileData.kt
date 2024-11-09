@@ -1,12 +1,11 @@
 package com.weissoft.appnavepe.ui.screens
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -16,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,13 +28,17 @@ import com.weissoft.appnavepe.room.CarProfileRepository
 import kotlinx.coroutines.launch
 
 @Composable
-fun CarProfileScreen(navController: NavController, repository: CarProfileRepository) {
+fun CarProfileData(navController: NavController, repository: CarProfileRepository) {
     val scope = rememberCoroutineScope()
     var carProfile by remember { mutableStateOf<CarProfile?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Obtener el perfil desde la base de datos cuando la pantalla se carga
     LaunchedEffect(Unit) {
-        carProfile = repository.getProfile()
+        try {
+            carProfile = repository.getProfile()
+        } catch (e: Exception) {
+            errorMessage = "Error al cargar el perfil"
+        }
     }
 
     Box(
@@ -43,11 +47,10 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
             .background(Color.White)
     ) {
         Column(
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()) // Habilitar desplazamiento
         ) {
             // Flecha de retroceso y título en la parte superior
             Row(
@@ -74,38 +77,45 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            errorMessage?.let { error ->
+                Text(text = error, color = Color.Red)
+            }
+
             if (carProfile != null) {
-                // Nombre del auto en mayúsculas
+                // Mostrar el apodo del auto
                 Text(
-                    text = carProfile?.carNickname?.uppercase() ?: "",
+                    text = carProfile?.carNickname ?: "",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.Start)
+                    color = Color.Black
                 )
 
-                // Cargar la imagen desde la URI guardada
-                val painter = rememberAsyncImagePainter(model = carProfile?.imageUri)
+                // Mostrar la imagen subida o una imagen por defecto
+                val imageUri = carProfile?.imageUri
                 Image(
-                    painter = painter,
+                    painter = if (imageUri != null) rememberAsyncImagePainter(model = Uri.parse(imageUri)) else painterResource(R.drawable.car_profile),
                     contentDescription = "Imagen del Auto",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .height(200.dp)
+                        .padding(vertical = 16.dp)
+                        .background(Color.LightGray, RoundedCornerShape(8.dp))
                 )
 
-                // Detalles del perfil en el formato visual deseado
-                ProfileDetail(label = "NOMBRE DEL CONDUCTOR", detail = carProfile?.driverName?.uppercase())
-                ProfileDetail(label = "MODELO DE AUTO", detail = carProfile?.carModel?.uppercase())
-                ProfileDetail(label = "PLACA", detail = carProfile?.plate?.uppercase())
-                ProfileDetail(label = "COLOR", detail = carProfile?.color?.uppercase())
+                // Detalles del perfil en estilo de etiquetas
+                Column(horizontalAlignment = Alignment.Start) {
+                    ProfileDetailItem("Nombre del Conductor", carProfile?.driverName)
+                    ProfileDetailItem("Modelo de Auto", carProfile?.carModel)
+                    ProfileDetailItem("Placa", carProfile?.plate)
+                    ProfileDetailItem("Color", carProfile?.color)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón para actualizar perfil
+                // Botón para actualizar perfil con borde blanco
                 Button(
-                    onClick = { navController.navigate("createProfileScreen") },
+                    onClick = { navController.navigate("createProfileScreen") }, // Navega a la pantalla de actualización
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     modifier = Modifier
@@ -122,8 +132,13 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
                 Button(
                     onClick = {
                         scope.launch {
-                            repository.deleteProfile()
-                            carProfile = null // Actualiza el estado después de eliminar
+                            try {
+                                repository.deleteProfile()
+                                carProfile = null // Actualizar estado tras eliminación
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                errorMessage = "Error al eliminar el perfil"
+                            }
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
@@ -135,28 +150,23 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
                     Text("ELIMINAR", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             } else {
-                // Mostrar opción para crear un perfil si no existe
+                // Mostrar mensaje y botón para crear perfil si no hay datos guardados
                 Text(
                     text = "¿AUN NO TIENES UN PERFIL?",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Image(
                     painter = painterResource(id = R.drawable.car_profile),
                     contentDescription = "Imagen del Auto",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
+                    modifier = Modifier.size(200.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón para crear un nuevo perfil
                 Button(
                     onClick = { navController.navigate("createProfileScreen") },
                     shape = RoundedCornerShape(16.dp),
@@ -178,19 +188,18 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
 }
 
 @Composable
-fun ProfileDetail(label: String, detail: String?) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Gray
-        )
-        Text(
-            text = detail ?: "",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-    }
+fun ProfileDetailItem(label: String, detail: String?) {
+    Text(
+        text = "$label:",
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = Color.Gray
+    )
+    Text(
+        text = detail ?: "",
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
 }
