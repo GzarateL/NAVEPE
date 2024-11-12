@@ -1,6 +1,7 @@
 // NavGraph.kt
 package com.weissoft.appnavepe.ui.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,7 +14,7 @@ import com.weissoft.appnavepe.room.CarProfileRepository
 import com.weissoft.appnavepe.sensores.MapScreen
 
 @Composable
-fun NavGraph(navController: NavHostController, repository: CarProfileRepository) {
+fun NavGraph(navController: NavHostController, repository: CarProfileRepository, context: Context) {
     NavHost(navController = navController, startDestination = "dashboard") {
         // Pantalla de inicio: Dashboard
         composable("dashboard") {
@@ -35,7 +36,13 @@ fun NavGraph(navController: NavHostController, repository: CarProfileRepository)
             CameraScreen(navController = navController)
         }
 
+        // Pantalla del mapa (MapScreen)
         composable("mapScreen") {
-            MapScreen() }
+            MapScreen(
+                navController = navController,
+                repository = repository,
+                context = context // Pasa el contexto desde el parámetro
+            )
+        }
     }
 }

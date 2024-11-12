@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -19,7 +18,7 @@ import androidx.room.Room
 import com.weissoft.appnavepe.room.CarProfileDatabase
 import com.weissoft.appnavepe.room.CarProfileRepository
 import com.weissoft.appnavepe.sensores.CameraScreen
-import com.weissoft.appnavepe.sensores.MapScreen // Asegúrate de importar MapScreen
+import com.weissoft.appnavepe.sensores.MapScreen
 import com.weissoft.appnavepe.ui.screens.CarProfileScreen
 import com.weissoft.appnavepe.ui.screens.CreateProfileScreen
 import com.weissoft.appnavepe.ui.theme.AppNavepeTheme
@@ -80,11 +79,15 @@ class MainActivity : ComponentActivity() {
                         composable("cameraScreen") {
                             CameraScreen(navController = navController)
                         }
-                        composable("mapScreen") { // Nueva entrada para MapScreen
-                            MapScreen() // Llama a MapScreen desde el paquete sensores
-                        }
-                    }
-                }
+                        composable("mapScreen") { // Pasa el repository y context a MapScreen
+                            MapScreen(
+                                navController = navController,
+                                repository = repository,
+                                context = this@MainActivity // Pasa el contexto de la actividad actual
+                            )
+                        } // Cierra el composable "mapScreen"
+                    } // Cierra NavHost
+                } // Cierra Scaffold
             }
         }
     }

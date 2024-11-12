@@ -70,7 +70,7 @@ dependencies {
     kapt(libs.androidx.room.compiler) // Esta línea es esencial para el compilador de Room
 
     // Nuevas dependencias
-    implementation ("io.coil-kt:coil-compose:2.1.0")
+    implementation ("io.coil-kt:coil-compose:2.2.0")
     implementation("com.google.android.material:material:1.9.0")
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")

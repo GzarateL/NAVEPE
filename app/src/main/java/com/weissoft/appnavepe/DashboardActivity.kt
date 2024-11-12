@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.weissoft.appnavepe.sensores.ESP32CameraView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -131,7 +132,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "¿QUE ESTA PASANDO AHORA?",
+                text = "CÁMARA EN DIRECTO",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
