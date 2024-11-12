@@ -51,6 +51,9 @@ android {
 
 dependencies {
 
+    val mapsComposeVersion = "4.4.1"
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -68,6 +71,19 @@ dependencies {
 
     // Nuevas dependencias
     implementation ("io.coil-kt:coil-compose:2.1.0")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth") // Para autenticación en Firebase
+    implementation("com.google.android.gms:play-services-auth")
+    implementation("com.facebook.android:facebook-android-sdk:15.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+    implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
+    // Utilidades de Google Maps para Jetpack Compose
+    implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
+    // Widgets de Google Maps Compose
+    implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
+
 
     // Testing dependencies
     testImplementation(libs.junit)

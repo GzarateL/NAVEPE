@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.weissoft.appnavepe.sensores.ESP32CameraView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,20 +38,17 @@ import java.util.*
 fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState() // Estado de desplazamiento
+    val scrollState = rememberScrollState()
+    var isSystemActive by remember { mutableStateOf(false) } // Estado del sistema
 
-    // Estado para almacenar la hora actual
     var currentTime by remember { mutableStateOf(getCurrentTime()) }
-
-    // Actualiza la hora cada segundo
     LaunchedEffect(Unit) {
         while (true) {
             currentTime = getCurrentTime()
-            kotlinx.coroutines.delay(1000L) // 1 segundo
+            kotlinx.coroutines.delay(1000L)
         }
     }
 
-    // Launcher para solicitar el permiso de llamada
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -72,9 +70,8 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState) // Habilita desplazamiento vertical
+                .verticalScroll(scrollState)
         ) {
-            // Row for Car Logo and Current Time
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +85,6 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     modifier = Modifier.size(60.dp)
                 )
 
-                // Mostrar hora actual en la misma línea que el logo
                 Text(
                     text = "HORA ACTUAL: $currentTime",
                     fontSize = 16.sp,
@@ -99,7 +95,6 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Rectángulo negro que ocupa todo el ancho de la pantalla
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -118,13 +113,23 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                         }
                     }
                 )
-                CircularButton(text = "VER MAPA", backgroundColor = Color(0xFFFFFF00))
-                CircularButton(text = "DESACTIVAR SISTEMA", backgroundColor = Color(0xFFFF0000))
+
+                CircularButton(
+                    text = "VER MAPA",
+                    backgroundColor = Color(0xFFFFFF00),
+                    onClick = { navController.navigate("mapScreen") }
+                )
+
+                // Botón para activar/desactivar sistema
+                CircularButton(
+                    text = if (isSystemActive) "ACTIVAR SISTEMA" else "DESACTIVAR SISTEMA",
+                    backgroundColor = if (isSystemActive) Color(0xFFADD8E6) else Color(0xFFFF0000),
+                    onClick = { isSystemActive = !isSystemActive }
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Camera Section
             Text(
                 text = "¿QUE ESTA PASANDO AHORA?",
                 fontSize = 18.sp,
@@ -135,28 +140,24 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Botón de la cámara con efecto de presionado
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .height(120.dp)
-                    .border(
-                        BorderStroke(2.dp, Color.Black),
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                    .border(BorderStroke(2.dp, Color.Black), shape = RoundedCornerShape(8.dp))
                     .background(if (isPressed) Color.Gray else Color.White, shape = RoundedCornerShape(8.dp))
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onPress = {
-                                isPressed = true
-                                tryAwaitRelease()
-                                isPressed = false
+                            onTap = {
+                                // Navega a CameraScreen al presionar el Box
+                                navController.navigate("cameraScreen")
                             }
                         )
                     },
                 contentAlignment = Alignment.Center
             ) {
+                // Mostrar el ícono en lugar de la transmisión
                 Image(
                     painter = painterResource(id = R.drawable.ic_eye),
                     contentDescription = "Camera Icon",
@@ -164,9 +165,10 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                 )
             }
 
+
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Last Movements Section
             Text(
                 text = "ULTIMAS NOTIFICACIONES",
                 fontSize = 18.sp,
@@ -175,10 +177,9 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                 modifier = Modifier.padding(start = 16.dp)
             )
 
-            Spacer(modifier = Modifier.weight(1f)) // Espaciador para empujar la barra de navegación hacia abajo
+            Spacer(modifier = Modifier.weight(1f))
         }
 
-        // Bottom Navigation Bar aligned to the bottom of the screen
         BottomNavigationBar(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -204,6 +205,7 @@ fun CircularButton(text: String, backgroundColor: Color, onClick: () -> Unit = {
         )
     }
 }
+
 
 @Composable
 fun BottomNavigationBar(

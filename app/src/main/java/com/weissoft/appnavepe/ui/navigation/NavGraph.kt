@@ -8,7 +8,9 @@ import androidx.navigation.compose.composable
 import com.weissoft.appnavepe.DashboardScreen
 import com.weissoft.appnavepe.ui.screens.CarProfileData
 import com.weissoft.appnavepe.ui.screens.CreateProfileScreen
+import com.weissoft.appnavepe.sensores.CameraScreen
 import com.weissoft.appnavepe.room.CarProfileRepository
+import com.weissoft.appnavepe.sensores.MapScreen
 
 @Composable
 fun NavGraph(navController: NavHostController, repository: CarProfileRepository) {
@@ -17,13 +19,23 @@ fun NavGraph(navController: NavHostController, repository: CarProfileRepository)
         composable("dashboard") {
             DashboardScreen(navController = navController)
         }
+
         // Pantalla del perfil de auto
         composable("carProfileScreen") {
             CarProfileData(navController = navController, repository = repository)
         }
+
         // Pantalla para crear o actualizar el perfil de auto
         composable("createProfileScreen") {
             CreateProfileScreen(navController = navController, repository = repository)
         }
+
+        // Pantalla de la cámara (CameraScreen)
+        composable("cameraScreen") {
+            CameraScreen(navController = navController)
+        }
+
+        composable("mapScreen") {
+            MapScreen() }
     }
 }
