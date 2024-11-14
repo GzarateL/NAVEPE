@@ -3,6 +3,7 @@ package com.weissoft.appnavepe
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,9 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.weissoft.appnavepe.sensores.ESP32CameraView
+import pl.droidsonroids.gif.GifImageView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,7 +41,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
     val context = LocalContext.current
     val callPermissionGranted = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    var isSystemActive by remember { mutableStateOf(false) } // Estado del sistema
+    var isSystemActive by remember { mutableStateOf(false) }
 
     var currentTime by remember { mutableStateOf(getCurrentTime()) }
     LaunchedEffect(Unit) {
@@ -103,8 +104,8 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                CircularButton(
-                    text = "LLAMAR POLICÍA",
+                CircularIconButton(
+                    iconResource = R.drawable.ic_callpolice,
                     backgroundColor = Color(0xFF00FF00),
                     onClick = {
                         if (callPermissionGranted.value) {
@@ -115,15 +116,14 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     }
                 )
 
-                CircularButton(
-                    text = "VER MAPA",
+                CircularIconButton(
+                    iconResource = R.drawable.ic_map,
                     backgroundColor = Color(0xFFFFFF00),
                     onClick = { navController.navigate("mapScreen") }
                 )
 
-                // Botón para activar/desactivar sistema
-                CircularButton(
-                    text = if (isSystemActive) "ACTIVAR SISTEMA" else "DESACTIVAR SISTEMA",
+                CircularIconButton(
+                    iconResource = if (isSystemActive) R.drawable.ic_system_active else R.drawable.ic_system_inactive,
                     backgroundColor = if (isSystemActive) Color(0xFFADD8E6) else Color(0xFFFF0000),
                     onClick = { isSystemActive = !isSystemActive }
                 )
@@ -141,6 +141,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Box con el GIF animado
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -151,27 +152,30 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                // Navega a CameraScreen al presionar el Box
                                 navController.navigate("cameraScreen")
                             }
                         )
                     },
                 contentAlignment = Alignment.Center
             ) {
-                // Mostrar el ícono en lugar de la transmisión
-                Image(
-                    painter = painterResource(id = R.drawable.ic_eye),
-                    contentDescription = "Camera Icon",
-                    modifier = Modifier.size(40.dp)
+                // Mostrar el GIF y ajustarlo dentro de los bordes redondeados
+                AndroidView(
+                    factory = { context ->
+                        GifImageView(context).apply {
+                            setImageResource(R.drawable.camera_icon) // Asegúrate de que el GIF esté en `res/drawable`
+                            scaleType = ImageView.ScaleType.FIT_CENTER
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxSize() // Ajusta para que ocupe todo el espacio disponible sin sobresalir
+                        .padding(4.dp) // Ajuste adicional para evitar que el GIF se pegue a los bordes
                 )
             }
-
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "ULTIMAS NOTIFICACIONES",
+                text = "ÚLTIMAS NOTIFICACIONES",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -191,22 +195,20 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 }
 
 @Composable
-fun CircularButton(text: String, backgroundColor: Color, onClick: () -> Unit = {}) {
+fun CircularIconButton(iconResource: Int, backgroundColor: Color, onClick: () -> Unit = {}) {
     Button(
         onClick = onClick,
         modifier = Modifier.size(100.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor)
     ) {
-        Text(
-            text = text,
-            color = Color.Black,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
+        Image(
+            painter = painterResource(id = iconResource),
+            contentDescription = null,
+            modifier = Modifier.size(40.dp)
         )
     }
 }
-
 
 @Composable
 fun BottomNavigationBar(
@@ -223,7 +225,7 @@ fun BottomNavigationBar(
         NavigationItem(iconResource = R.drawable.ic_settings, label = "AJUSTES") {
             // Acción para ir a ajustes
         }
-        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERIA") {
+        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERÍA") {
             // Acción para ir a galería
         }
         NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL") {

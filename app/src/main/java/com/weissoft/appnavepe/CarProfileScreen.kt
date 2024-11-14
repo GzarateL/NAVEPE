@@ -16,16 +16,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.weissoft.appnavepe.R
 import com.weissoft.appnavepe.room.CarProfile
 import com.weissoft.appnavepe.room.CarProfileRepository
 import kotlinx.coroutines.launch
+import pl.droidsonroids.gif.GifImageView
 
 @Composable
 fun CarProfileScreen(navController: NavController, repository: CarProfileRepository) {
@@ -146,9 +149,13 @@ fun CarProfileScreen(navController: NavController, repository: CarProfileReposit
                         .padding(bottom = 8.dp)
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.car_profile),
-                    contentDescription = "Imagen del Auto",
+                // Mostrar GIF en lugar de imagen estática cuando no hay perfil
+                AndroidView(
+                    factory = { context ->
+                        GifImageView(context).apply {
+                            setImageResource(R.drawable.ic_carprofile) // Asegúrate de que el GIF esté en `res/drawable`
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(400.dp)
