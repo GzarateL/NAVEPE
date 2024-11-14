@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import pl.droidsonroids.gif.GifImageView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,6 +43,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
     val callPermissionGranted = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     var isSystemActive by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     var currentTime by remember { mutableStateOf(getCurrentTime()) }
     LaunchedEffect(Unit) {
@@ -63,6 +65,14 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
     }
 
     var isPressed by remember { mutableStateOf(false) }
+    var recentPirStates by remember { mutableStateOf(listOf<Boolean>()) }
+
+    // Llama a la API para obtener los últimos datos de `pir_state`
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            recentPirStates = getLastFivePirStatesFromApi()
+        }
+    }
 
     Box(
         modifier = modifier
@@ -73,6 +83,7 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
+                .padding(bottom = 16.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -141,7 +152,6 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Box con el GIF animado
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -158,17 +168,16 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     },
                 contentAlignment = Alignment.Center
             ) {
-                // Mostrar el GIF y ajustarlo dentro de los bordes redondeados
                 AndroidView(
                     factory = { context ->
                         GifImageView(context).apply {
-                            setImageResource(R.drawable.camera_icon) // Asegúrate de que el GIF esté en `res/drawable`
+                            setImageResource(R.drawable.camera_icon)
                             scaleType = ImageView.ScaleType.FIT_CENTER
                         }
                     },
                     modifier = Modifier
-                        .fillMaxSize() // Ajusta para que ocupe todo el espacio disponible sin sobresalir
-                        .padding(4.dp) // Ajuste adicional para evitar que el GIF se pegue a los bordes
+                        .fillMaxSize()
+                        .padding(4.dp)
                 )
             }
 
@@ -182,7 +191,42 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                 modifier = Modifier.padding(start = 16.dp)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Sección de notificación de movimiento
+            if (recentPirStates.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                recentPirStates.reversed().forEach { pirState ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .background(if (pirState) Color.Black else Color.LightGray, shape = RoundedCornerShape(8.dp))
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = if (pirState) "MOVIMIENTO SOSPECHOSO DETECTADO" else "No hay movimiento",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (pirState) Color.White else Color.DarkGray
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            } else {
+                Text(
+                    text = "No se ha detectado actividad sospechosa.",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         BottomNavigationBar(
@@ -264,4 +308,14 @@ fun makePhoneCall(context: Context, phoneNumber: String) {
     val intent = Intent(Intent.ACTION_CALL)
     intent.data = Uri.parse("tel:$phoneNumber")
     context.startActivity(intent)
+}
+
+// Función para obtener los últimos cinco estados de pir_state desde la API
+suspend fun getLastFivePirStatesFromApi(): List<Boolean> {
+    return try {
+        val sensorDataList = RetrofitClient.apiService.getAllSensorData()
+        sensorDataList.takeLast(5).map { it.pir_state }
+    } catch (e: Exception) {
+        emptyList()
+    }
 }
