@@ -54,6 +54,9 @@ class MainActivity : ComponentActivity() {
                     }
                     onDispose { }
                 }
+                val onClickNoticias = {
+                    navController.navigate("newsScreen")
+                }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
@@ -86,6 +89,10 @@ class MainActivity : ComponentActivity() {
                                 context = this@MainActivity // Pasa el contexto de la actividad actual
                             )
                         } // Cierra el composable "mapScreen"
+                        // Pantalla de noticias
+                        composable("newsScreen") {
+                            NewsScreen(navController = navController)
+                        }
                     } // Cierra NavHost
                 } // Cierra Scaffold
             }

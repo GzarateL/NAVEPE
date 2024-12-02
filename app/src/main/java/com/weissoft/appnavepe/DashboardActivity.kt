@@ -158,7 +158,10 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                     .padding(horizontal = 16.dp)
                     .height(120.dp)
                     .border(BorderStroke(2.dp, Color.Black), shape = RoundedCornerShape(8.dp))
-                    .background(if (isPressed) Color.Gray else Color.White, shape = RoundedCornerShape(8.dp))
+                    .background(
+                        if (isPressed) Color.Gray else Color.White,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
@@ -199,7 +202,10 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .background(if (pirState) Color.Black else Color.LightGray, shape = RoundedCornerShape(8.dp))
+                            .background(
+                                if (pirState) Color.Black else Color.LightGray,
+                                shape = RoundedCornerShape(8.dp)
+                            )
                             .padding(16.dp)
                     ) {
                         Row(
@@ -233,7 +239,8 @@ fun DashboardScreen(modifier: Modifier = Modifier, navController: NavHostControl
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
-            onProfileClick = { navController.navigate("carProfile") }
+            onClickNoticias = { navController.navigate("newsScreen") }, // Navegación a noticias
+            onProfileClick = { navController.navigate("carProfile") }    // Navegación al perfil
         )
     }
 }
@@ -257,6 +264,7 @@ fun CircularIconButton(iconResource: Int, backgroundColor: Color, onClick: () ->
 @Composable
 fun BottomNavigationBar(
     modifier: Modifier = Modifier,
+    onClickNoticias: () -> Unit,
     onProfileClick: () -> Unit
 ) {
     Row(
@@ -266,11 +274,8 @@ fun BottomNavigationBar(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        NavigationItem(iconResource = R.drawable.ic_settings, label = "AJUSTES") {
-            // Acción para ir a ajustes
-        }
-        NavigationItem(iconResource = R.drawable.ic_galery, label = "GALERÍA") {
-            // Acción para ir a galería
+        NavigationItem(iconResource = R.drawable.ic_news, label = "NOTICIAS") {
+            onClickNoticias()
         }
         NavigationItem(iconResource = R.drawable.ic_profile, label = "PERFIL") {
             onProfileClick()

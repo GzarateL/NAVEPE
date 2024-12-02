@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.weissoft.appnavepe.DashboardScreen
+import com.weissoft.appnavepe.NewsScreen
 import com.weissoft.appnavepe.ui.screens.CarProfileData
 import com.weissoft.appnavepe.ui.screens.CreateProfileScreen
 import com.weissoft.appnavepe.sensores.CameraScreen
@@ -44,5 +45,9 @@ fun NavGraph(navController: NavHostController, repository: CarProfileRepository,
                 context = context // Pasa el contexto desde el parámetro
             )
         }
+        composable("newsScreen") {
+            NewsScreen(navController)
+        }
+
     }
 }
