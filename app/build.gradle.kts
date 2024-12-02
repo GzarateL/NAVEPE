@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt") // Asegúrate de tener esta línea para habilitar KAPT para Room
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -75,7 +76,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth") // Para autenticación en Firebase
-    implementation("com.google.android.gms:play-services-auth")
+    implementation("com.google.android.gms:play-services-auth:20.4.0")
     implementation("com.facebook.android:facebook-android-sdk:15.0.1")
     implementation("com.google.android.gms:play-services-maps:18.0.2")
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
